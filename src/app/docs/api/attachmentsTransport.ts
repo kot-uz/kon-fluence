@@ -15,8 +15,9 @@ const realUploadAttachment = async ({
   onProgress,
 }: UploadAttachmentArgs): Promise<Attachment> => {
   const formData = new FormData();
-  formData.append('file', file);
+  // pageId должен идти до файла: сервер проверяет права, пока поток не начали читать.
   formData.append('pageId', pageId);
+  formData.append('file', file);
   const { data } = await httpClient.post<Attachment>('/docs/Attachments', formData, {
     onUploadProgress: (event) => {
       if (event.total) onProgress?.(Math.round((event.loaded / event.total) * 100));
