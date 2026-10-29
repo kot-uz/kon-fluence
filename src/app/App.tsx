@@ -7,6 +7,8 @@ import AppHeader from 'app/layout/AppHeader';
 import AppMessage from 'app/shared-components/AppMessage';
 import Loading from 'app/shared-components/Loading';
 import SpacesPage from 'app/main/spaces/SpacesPage';
+import AuthPage from 'app/auth/AuthPage';
+import CloudGuard from 'app/auth/CloudGuard';
 import { DOCS_BASE_PATH, DocsAppConfig } from 'app/docs';
 
 const AppLayout = () => (
@@ -27,12 +29,16 @@ const App = () => (
       <BrowserRouter>
         <Routes>
           <Route element={<AppLayout />}>
-            <Route path="/" element={<SpacesPage />} />
-            {/* роуты описаны самим модулем документации, приложение только задаёт префикс */}
-            <Route path={DOCS_BASE_PATH}>
-              {DocsAppConfig.routes.map((route) => (
-                <Route key={route.path} path={route.path} element={route.element} />
-              ))}
+            <Route path="/login" element={<AuthPage mode="login" />} />
+            <Route path="/register" element={<AuthPage mode="register" />} />
+            <Route element={<CloudGuard />}>
+              <Route path="/" element={<SpacesPage />} />
+              {/* роуты описаны самим модулем документации, приложение только задаёт префикс */}
+              <Route path={DOCS_BASE_PATH}>
+                {DocsAppConfig.routes.map((route) => (
+                  <Route key={route.path} path={route.path} element={route.element} />
+                ))}
+              </Route>
             </Route>
             <Route path="*" element={<Navigate to="/" replace />} />
           </Route>

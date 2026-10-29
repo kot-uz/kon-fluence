@@ -24,6 +24,16 @@ const locale = {
   AppStorageMode: "Где хранятся данные",
   AppStorageLocal: "На этом устройстве",
   AppStorageCloud: "В облаке",
+  AuthLoginTitle: "Вход в аккаунт",
+  AuthRegisterTitle: "Регистрация",
+  AuthLogout: "Выйти",
+  AuthLogin: "Войти",
+  AuthRegister: "Зарегистрироваться",
+  AuthPassword: "Пароль",
+  AuthPasswordHint: "Не короче 8 символов",
+  AuthNoAccount: "Нет аккаунта?",
+  AuthHaveAccount: "Уже есть аккаунт?",
+  AuthContinueWithout: "Продолжить без аккаунта",
   AppBackToSpaces: "К списку пространств",
 
   // ключи модуля документации

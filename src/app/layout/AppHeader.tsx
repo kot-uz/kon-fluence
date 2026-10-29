@@ -23,6 +23,7 @@ import {
   Computer,
   DarkMode,
   LightMode,
+  Logout,
   MenuBook,
   Person,
 } from '@mui/icons-material';
@@ -41,6 +42,8 @@ import {
   setStorageMode,
 } from 'app/store/storageModeSlice';
 import type { StorageMode } from 'app/store/storageModeSlice';
+import { clearAccount, selectAccount } from 'app/store/authSlice';
+import { logout } from 'app/auth/authApi';
 import { docsHostApi } from 'app/services/docs/docsHostApi';
 import { resetDocsLocalData } from 'app/docs';
 
@@ -51,10 +54,12 @@ const AppHeader = () => {
   const { isDark, toggle } = useThemeMode();
   const language = useAppSelector(selectLanguage);
   const user = useAppSelector(selectUser);
+  const account = useAppSelector(selectAccount);
   const storageMode = useAppSelector(selectStorageMode);
   const isLocalMode = storageMode === 'local';
   const navigate = useNavigate();
   const [modeAnchor, setModeAnchor] = useState<HTMLElement | null>(null);
+  const [accountAnchor, setAccountAnchor] = useState<HTMLElement | null>(null);
   const [userDialogOpen, setUserDialogOpen] = useState(false);
   const [resetConfirmOpen, setResetConfirmOpen] = useState(false);
   const [name, setName] = useState(user.fio);
@@ -75,6 +80,15 @@ const AppHeader = () => {
     if (mode === storageMode) return;
     dispatch(setStorageMode(mode));
     // кэш хранит данные прежнего режима
+    dispatch(docsHostApi.util.resetApiState());
+    navigate('/');
+  };
+
+  const signOut = async () => {
+    setAccountAnchor(null);
+    await logout();
+    dispatch(clearAccount());
+    dispatch(setStorageMode('local'));
     dispatch(docsHostApi.util.resetApiState());
     navigate('/');
   };
@@ -147,11 +161,32 @@ const AppHeader = () => {
             </IconButton>
           </Tooltip>
 
-          <Tooltip title={`${t('AppUserName')}: ${user.fio}`}>
-            <IconButton size="small" onClick={openUserDialog}>
-              <Person fontSize="small" />
-            </IconButton>
-          </Tooltip>
+          {isLocalMode ? (
+            <Tooltip title={`${t('AppUserName')}: ${user.fio}`}>
+              <IconButton size="small" onClick={openUserDialog}>
+                <Person fontSize="small" />
+              </IconButton>
+            </Tooltip>
+          ) : (
+            <>
+              <Tooltip title={account?.fullName ?? ''}>
+                <IconButton size="small" onClick={(event) => setAccountAnchor(event.currentTarget)}>
+                  <Person fontSize="small" />
+                </IconButton>
+              </Tooltip>
+              <Menu
+                anchorEl={accountAnchor}
+                open={!!accountAnchor}
+                onClose={() => setAccountAnchor(null)}
+              >
+                <MenuItem disabled>{account?.email}</MenuItem>
+                <MenuItem onClick={signOut}>
+                  <Logout fontSize="small" className="mr-8" />
+                  {t('AuthLogout')}
+                </MenuItem>
+              </Menu>
+            </>
+          )}
         </Toolbar>
       </AppBar>
 

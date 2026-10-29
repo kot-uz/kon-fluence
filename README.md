@@ -66,7 +66,12 @@ REACT_APP_API_URL=https://api.example.com
 
 Приложение будет обращаться к `/docs/Spaces/...`, `/docs/Pages/...`, `/docs/Attachments/...`
 (контракт описан в `src/app/docs/local/handlers.ts`). Токен берётся из `localStorage`,
-ключ `jwt_access_token`. Своей авторизации в приложении нет.
+ключ `jwt_access_token`. Вход и регистрация — на `/login` и `/register`, при 401 токен
+обновляется через `/auth/refresh`.
+
+В dev-режиме запросы `/docs` и `/auth` проксирует Vite на `DEV_API_PROXY_TARGET`
+(по умолчанию `http://localhost:3000`), поэтому `REACT_APP_API_URL` указывает на сам dev-сервер
+(например, `http://localhost:3010`) — refresh-cookie остаётся на одном origin.
 
 Переменные используют префикс `REACT_APP_`, хотя сборщик — Vite: подстановку
 `process.env.REACT_APP_*` делает `define` в `vite.config.ts`.

@@ -5,6 +5,7 @@ import type { TypedUseSelectorHook } from 'react-redux';
 import { docsHostApi } from 'app/services/docs/docsHostApi';
 import layout from './layout';
 import user from './userSlice';
+import auth from './authSlice';
 import i18n from './i18nSlice';
 import storageMode from './storageModeSlice';
 
@@ -13,6 +14,7 @@ const store = configureStore({
     [docsHostApi.reducerPath]: docsHostApi.reducer,
     layout,
     user,
+    auth,
     i18n,
     storageMode,
   },

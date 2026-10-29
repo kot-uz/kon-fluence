@@ -24,6 +24,16 @@ const locale = {
   AppStorageMode: "Ma'lumotlar qayerda saqlanadi",
   AppStorageLocal: "Shu qurilmada",
   AppStorageCloud: "Bulutda",
+  AuthLoginTitle: "Akkauntga kirish",
+  AuthRegisterTitle: "Ro'yxatdan o'tish",
+  AuthLogout: "Chiqish",
+  AuthLogin: "Kirish",
+  AuthRegister: "Ro'yxatdan o'tish",
+  AuthPassword: "Parol",
+  AuthPasswordHint: "Kamida 8 ta belgi",
+  AuthNoAccount: "Akkaunt yo'qmi?",
+  AuthHaveAccount: "Akkauntingiz bormi?",
+  AuthContinueWithout: "Akkauntsiz davom etish",
   AppBackToSpaces: "Maydonlar ro'yxatiga",
 
   // ключи модуля документации

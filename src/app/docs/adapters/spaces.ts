@@ -3,6 +3,8 @@
 import { useMemo } from 'react';
 import { useAppSelector } from 'app/store';
 import { selectUser } from 'app/store/userSlice';
+import { selectAccount } from 'app/store/authSlice';
+import { selectStorageMode } from 'app/store/storageModeSlice';
 import { useGetSpacesQuery } from '../api/spacesApi';
 import { SPACE_TYPES } from '../constants';
 import type { DocsUser, SpaceInfo } from '../types';
@@ -33,8 +35,13 @@ export const useSpaceInfo = (spaceType: string | undefined, spaceId: string | un
 
 export const useCurrentUser = (): DocsUser => {
   const user = useAppSelector(selectUser);
+  const account = useAppSelector(selectAccount);
+  const isCloud = useAppSelector(selectStorageMode) === 'cloud';
   return useMemo(
-    () => ({ id: user?.staffId, fullName: user?.fio || user?.fullName }),
-    [user?.staffId, user?.fio, user?.fullName]
+    () =>
+      isCloud && account
+        ? { id: account.id, fullName: account.fullName }
+        : { id: user?.staffId, fullName: user?.fio || user?.fullName },
+    [isCloud, account, user?.staffId, user?.fio, user?.fullName]
   );
 };
