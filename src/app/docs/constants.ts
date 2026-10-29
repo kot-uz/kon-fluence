@@ -1,10 +1,7 @@
+import { SPACE_TYPES } from '@kon-fluence/shared';
 import type { DocContent, SpaceKey, SpaceType } from './types';
 
-// Тип пространства документации: PROJECT — привязано к проекту, SPACE — самостоятельное.
-export const SPACE_TYPES = {
-  PROJECT: 'project',
-  SPACE: 'space',
-} as const;
+export { SPACE_TYPES };
 
 // Префикс роутов документации.
 export const DOCS_BASE_PATH = '/docs';

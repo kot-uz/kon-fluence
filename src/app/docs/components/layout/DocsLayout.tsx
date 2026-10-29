@@ -8,7 +8,7 @@ import { DOCS_MODE, getSpaceKey, SIDEBAR_WIDTH } from '../../constants';
 import { useDocsContext } from '../../context/DocsContext';
 import { DocsDialogsContext } from '../../context/DocsDialogsContext';
 import type { DocsDialogState, DocsDialogsContextValue } from '../../context/DocsDialogsContext';
-import { getFirstPageId } from '../../utils/tree';
+import { getFirstPageId } from '@kon-fluence/shared';
 import { readStorage, writeStorage } from '../../utils/storage';
 import PageEdit from '../page/PageEdit';
 import PageView from '../page/PageView';

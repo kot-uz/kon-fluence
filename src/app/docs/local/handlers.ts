@@ -2,8 +2,7 @@ import { nanoid } from 'nanoid';
 import type { IDBPDatabase } from 'idb';
 import type { User } from 'app/store/userSlice';
 import { EMPTY_DOC, SPACE_TYPES, getSpaceKey } from '../constants';
-import { setTaskChecked } from '../utils/tasks';
-import { getChildren, getDescendantIds, getLastPosition } from '../utils/tree';
+import { getChildren, getDescendantIds, getLastPosition, setTaskChecked } from '@kon-fluence/shared';
 import type {
   Author,
   DocContent,

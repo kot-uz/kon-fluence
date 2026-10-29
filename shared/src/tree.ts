@@ -1,4 +1,4 @@
-import type { DocsTreeItem, DocsTreeNode } from '../types';
+import type { DocsTreeItem, DocsTreeNode } from './types';
 
 /** Минимум, который нужен функциям дерева: id, parentId и position. */
 type TreeLike = Pick<DocsTreeItem, 'id' | 'parentId' | 'position'>;

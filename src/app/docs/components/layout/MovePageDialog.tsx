@@ -10,7 +10,7 @@ import {
 } from '@mui/material';
 import { handleError, useDocsTranslation, useNotify } from '../../adapters/platform';
 import { useMoveDocsPageMutation } from '../../api/docsApi';
-import { buildTree, getChildren, getDescendantIds, getPositionBetween } from '../../utils/tree';
+import { buildTree, getChildren, getDescendantIds, getPositionBetween } from '@kon-fluence/shared';
 import type { DocsTreeItem, DocsTreeNode } from '../../types';
 
 const ROOT = '__root__';

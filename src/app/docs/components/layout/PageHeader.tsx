@@ -4,7 +4,7 @@ import { EditOutlined } from '@mui/icons-material';
 import { useDocsTranslation } from '../../adapters/platform';
 import { DOCS_MODE } from '../../constants';
 import { useDocsContext } from '../../context/DocsContext';
-import { getAncestors } from '../../utils/tree';
+import { getAncestors } from '@kon-fluence/shared';
 import type { DocsPage, DocsTreeItem } from '../../types';
 import PageActionsMenu from './PageActionsMenu';
 

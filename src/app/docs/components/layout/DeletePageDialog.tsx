@@ -3,7 +3,7 @@ import { handleError, useDocsTranslation, useNotify } from '../../adapters/platf
 import { useDeleteDocsPageMutation } from '../../api/docsApi';
 import { DOCS_MODE } from '../../constants';
 import { useDocsContext } from '../../context/DocsContext';
-import { getDescendantIds } from '../../utils/tree';
+import { getDescendantIds } from '@kon-fluence/shared';
 import type { DocsTreeItem } from '../../types';
 
 export interface DeletePageDialogProps {

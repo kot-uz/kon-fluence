@@ -10,7 +10,7 @@ import { useDocsContext } from '../../context/DocsContext';
 import { useDraft } from '../../hooks/useDraft';
 import { useUploadFiles } from '../../hooks/useUploadFiles';
 import type { UploadFiles } from '../../hooks/useUploadFiles';
-import { ensureTaskIds } from '../../utils/tasks';
+import { ensureTaskIds } from '@kon-fluence/shared';
 import type { DocContent, DocsPage } from '../../types';
 import { DocEditorContent, useDocEditor } from '../editor/DocEditor';
 import EditorToolbar from '../editor/toolbar/EditorToolbar';

@@ -1,5 +1,5 @@
 import i18next from 'i18next';
-import { ensureTaskIds } from '../utils/tasks';
+import { ensureTaskIds } from '@kon-fluence/shared';
 import type { DocContent } from '../types';
 
 /** Демо-страница: только название и содержимое, остальное дозаполняет buildPage. */

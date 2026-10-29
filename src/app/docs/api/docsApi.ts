@@ -1,5 +1,5 @@
 import { hostApi } from '../adapters/transport';
-import { setTaskChecked } from '../utils/tasks';
+import { setTaskChecked } from '@kon-fluence/shared';
 import type { DocContent, DocsPage, DocsTreeItem, SpaceType } from '../types';
 import { request } from './request';
 

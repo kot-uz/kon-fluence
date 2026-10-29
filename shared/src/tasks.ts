@@ -1,5 +1,5 @@
 import { nanoid } from 'nanoid';
-import type { DocContent } from '../types';
+import type { DocContent } from './types';
 
 const TASK_ITEM = 'taskItem';
 

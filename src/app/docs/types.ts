@@ -1,58 +1,20 @@
-import type { JSONContent } from '@tiptap/react';
-import type { DOCS_MODE, SPACE_TYPES } from './constants';
+import type { DocContent, SpaceType } from '@kon-fluence/shared';
+import type { DOCS_MODE } from './constants';
 
-/** Тип сущности, к которой привязано пространство (см. constants.SPACE_TYPES). */
-export type SpaceType = (typeof SPACE_TYPES)[keyof typeof SPACE_TYPES];
+export type {
+  Attachment,
+  Author,
+  DocContent,
+  DocsPage,
+  DocsTreeItem,
+  DocsTreeNode,
+  Space,
+  SpaceKey,
+  SpaceType,
+} from '@kon-fluence/shared';
 
 /** Режим страницы: просмотр или редактирование (см. constants.DOCS_MODE). */
 export type DocsMode = (typeof DOCS_MODE)[keyof typeof DOCS_MODE];
-
-/** Ключ пространства в хранилищах: `${spaceType}:${spaceId}` (см. constants.getSpaceKey). */
-export type SpaceKey = string;
-
-/** Содержимое страницы — документ ProseMirror в JSON. */
-export type DocContent = JSONContent;
-
-/** Автор создания или правки страницы. */
-export interface Author {
-  id: string | null;
-  fullName: string;
-}
-
-/** Элемент дерева страниц: всё, что нужно сайдбару, без содержимого. */
-export interface DocsTreeItem {
-  id: string;
-  parentId: string | null;
-  position: number;
-  title: string;
-}
-
-/** Узел дерева с вложенными детьми (см. utils/tree.buildTree). */
-export interface DocsTreeNode extends DocsTreeItem {
-  children: DocsTreeNode[];
-}
-
-/** Страница документации целиком. */
-export interface DocsPage extends DocsTreeItem {
-  spaceType: SpaceType;
-  spaceId: string;
-  content: DocContent;
-  version: number;
-  createdBy: Author;
-  createdAt: string;
-  updatedBy: Author;
-  updatedAt: string;
-}
-
-/** Вложение страницы. Сам файл отдаётся отдельным запросом (Blob). */
-export interface Attachment {
-  id: string;
-  pageId: string;
-  fileName: string;
-  mimeType: string;
-  size: number;
-  createdAt: string;
-}
 
 /** Локальный черновик страницы в режиме редактирования (localStorage). */
 export interface PageDraft {
@@ -66,13 +28,6 @@ export interface PageDraft {
 export interface DocsUser {
   id: string | undefined;
   fullName: string | undefined;
-}
-
-/** Пространство документации из списка (GET /Spaces). */
-export interface Space {
-  id: string;
-  title: string;
-  createdAt: string | null;
 }
 
 /** Информация о пространстве для отдельного роута (см. adapters/spaces.useSpaceInfo). */

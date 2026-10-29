@@ -3,7 +3,7 @@ import { useDocsTranslation } from '../../adapters/platform';
 import { getSpaceKey } from '../../constants';
 import { useDocsContext } from '../../context/DocsContext';
 import { readStorage, writeStorage } from '../../utils/storage';
-import { buildTree, filterTreeItems, getAncestors } from '../../utils/tree';
+import { buildTree, filterTreeItems, getAncestors } from '@kon-fluence/shared';
 import type { DocsTreeItem } from '../../types';
 import PageTreeItem from './PageTreeItem';
 
