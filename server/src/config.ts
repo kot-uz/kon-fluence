@@ -7,6 +7,9 @@ const schema = z.object({
   PORT: z.coerce.number().int().positive().default(3000),
   LOG_LEVEL: z.enum(['fatal', 'error', 'warn', 'info', 'debug', 'trace', 'silent']).default('info'),
   DATABASE_URL: z.string().min(1),
+  JWT_SECRET: z.string().min(32),
+  // Лимит запросов в минуту с одного IP на register/login/refresh.
+  AUTH_RATE_LIMIT_MAX: z.coerce.number().int().positive().default(10),
 });
 
 export type Config = z.infer<typeof schema>;

@@ -50,6 +50,7 @@ services:
       NODE_ENV: production
       PORT: 3000
       DATABASE_URL: postgres://kon:kon@postgres:5432/kon_fluence
+      JWT_SECRET: ${JWT_SECRET:?задайте JWT_SECRET (не короче 32 символов)}
       S3_ENDPOINT: http://minio:9000
       S3_REGION: us-east-1
       S3_BUCKET: kon-fluence
