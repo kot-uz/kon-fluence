@@ -10,6 +10,11 @@ const schema = z.object({
   JWT_SECRET: z.string().min(32),
   // Лимит запросов в минуту с одного IP на register/login/refresh.
   AUTH_RATE_LIMIT_MAX: z.coerce.number().int().positive().default(10),
+  S3_ENDPOINT: z.string().min(1),
+  S3_REGION: z.string().default('us-east-1'),
+  S3_BUCKET: z.string().min(1),
+  S3_ACCESS_KEY: z.string().min(1),
+  S3_SECRET_KEY: z.string().min(1),
 });
 
 export type Config = z.infer<typeof schema>;

@@ -1,10 +1,10 @@
 import { setTaskChecked, validateContent, type DocContent } from '@kon-fluence/shared';
-import { and, eq, isNull, ne, sql } from 'drizzle-orm';
+import { and, eq, inArray, isNull, ne, sql } from 'drizzle-orm';
 import type { FastifyInstance, FastifyRequest } from 'fastify';
 import type { ZodTypeProvider } from 'fastify-type-provider-zod';
 import { z } from 'zod';
 import type { Db } from '../db/client';
-import { pages, spaces } from '../db/schema';
+import { attachments, pages, spaces } from '../db/schema';
 import { getAuthorName, loadPage } from '../docs/pages';
 import { AppError, notFound } from '../errors';
 import { requireSpaceRole } from '../plugins/space-role';
@@ -283,7 +283,7 @@ export const pageRoutes = async (rawApp: FastifyInstance) => {
     async (request) => {
       const { id } = request.params;
       // Потомки и вложения удаляются каскадом по внешним ключам; id нужны для ответа.
-      const deletedIds = await db.transaction(async (tx) => {
+      const { deletedIds, keys } = await db.transaction(async (tx) => {
         const result = await tx.execute<{ id: string }>(sql`
           WITH RECURSIVE subtree AS (
             SELECT id FROM pages WHERE id = ${id}
@@ -291,9 +291,16 @@ export const pageRoutes = async (rawApp: FastifyInstance) => {
             SELECT p.id FROM pages p JOIN subtree s ON p.parent_id = s.id
           )
           SELECT id FROM subtree`);
+        const ids = result.rows.map((row) => row.id);
+        const files = await tx
+          .select({ storageKey: attachments.storageKey })
+          .from(attachments)
+          .where(inArray(attachments.pageId, ids));
         await tx.delete(pages).where(eq(pages.id, id));
-        return result.rows.map((row) => row.id);
+        return { deletedIds: ids, keys: files.map((file) => file.storageKey) };
       });
+      // Файлы удаляются после коммита; сбой хранилища не должен отменять удаление страниц.
+      await app.storage.delete(keys).catch((err) => request.log.error({ err }, 'не удалось удалить файлы вложений'));
       return { deletedIds };
     }
   );
