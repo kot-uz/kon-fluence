@@ -1,0 +1,44 @@
+{
+  "root": true,
+  "env": { "browser": true, "es2022": true },
+  "parser": "@typescript-eslint/parser",
+  "plugins": ["@typescript-eslint"],
+  "extends": [
+    "eslint:recommended",
+    "plugin:@typescript-eslint/recommended",
+    "plugin:react/recommended",
+    "plugin:react/jsx-runtime",
+    "plugin:react-hooks/recommended",
+    "plugin:jsx-a11y/recommended"
+  ],
+  "parserOptions": {
+    "ecmaVersion": "latest",
+    "sourceType": "module",
+    "ecmaFeatures": { "jsx": true }
+  },
+  "settings": { "react": { "version": "detect" } },
+  "globals": { "process": "readonly" },
+  "ignorePatterns": ["build", "node_modules"],
+  "rules": {
+    // типы проверяет tsc; eslint ловит только неиспользованное
+    "no-unused-vars": "off",
+    "@typescript-eslint/no-unused-vars": [
+      "warn",
+      { "argsIgnorePattern": "^_", "varsIgnorePattern": "^_", "ignoreRestSiblings": true }
+    ],
+    // пустой catch в обёртках localStorage и clipboard — осознанный
+    "no-empty": ["warn", { "allowEmptyCatch": true }],
+    // пропсы описаны типами TypeScript
+    "react/prop-types": "off",
+    "react/display-name": "off",
+    // автофокус в модальном диалоге — ожидаемое поведение, а не нарушение доступности
+    "jsx-a11y/no-autofocus": "off"
+  },
+  "overrides": [
+    {
+      // node view TipTap приходит с any-пропсами — описать их точнее нечем
+      "files": ["src/app/docs/components/editor/extensions/createMediaNode.ts"],
+      "rules": { "@typescript-eslint/no-explicit-any": "off" }
+    }
+  ]
+}

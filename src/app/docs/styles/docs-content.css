@@ -1,0 +1,749 @@
+/* Контент документации поверх Tailwind `prose`. Тёмная тема — через класс .dark (darkMode: 'class'). */
+
+.docs-content {
+  min-height: 1em;
+  word-break: break-word;
+  color: inherit;
+}
+
+.docs-content.ProseMirror {
+  outline: none;
+}
+
+.docs-editor .docs-content {
+  min-height: 320px;
+  padding-bottom: 120px;
+}
+
+.docs-content > :first-child {
+  margin-top: 0;
+}
+
+/* Плейсхолдер пустого документа */
+.docs-content p.is-editor-empty:first-child::before {
+  content: attr(data-placeholder);
+  float: left;
+  height: 0;
+  color: #9ca3af;
+  pointer-events: none;
+}
+
+.docs-content li > p {
+  margin-top: 0.25em;
+  margin-bottom: 0.25em;
+}
+
+.docs-content h5,
+.docs-content h6 {
+  font-weight: 600;
+  margin-top: 1.25em;
+  margin-bottom: 0.5em;
+}
+
+.docs-content h5 {
+  font-size: 1em;
+}
+
+.docs-content h6 {
+  font-size: 0.875em;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #6b7280;
+}
+
+.docs-content a {
+  color: #2563eb;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.docs-content code {
+  padding: 0.15em 0.35em;
+  border-radius: 4px;
+  background: rgba(135, 131, 120, 0.15);
+  color: #eb5757;
+  font-weight: 400;
+}
+
+.docs-content code::before,
+.docs-content code::after {
+  content: none;
+}
+
+.docs-content pre {
+  padding: 12px 16px;
+  border-radius: 8px;
+  background: #1f2937;
+  color: #f9fafb;
+}
+
+.docs-content pre code {
+  padding: 0;
+  background: none;
+  color: inherit;
+}
+
+.docs-content blockquote {
+  border-left: 3px solid #d1d5db;
+  font-style: normal;
+  color: #4b5563;
+}
+
+.docs-content blockquote p::before,
+.docs-content blockquote p::after {
+  content: none;
+}
+
+.docs-content mark {
+  padding: 0 2px;
+  border-radius: 2px;
+  color: inherit;
+}
+
+.docs-content hr {
+  margin: 1.5em 0;
+  border-color: #e5e7eb;
+}
+
+.docs-content hr.ProseMirror-selectednode {
+  border-color: #3b82f6;
+}
+
+.docs-content ::selection {
+  background: rgba(59, 130, 246, 0.25);
+}
+
+/* Таблицы. div.tableWrapper даёт горизонтальный скролл широким таблицам */
+.docs-content .tableWrapper {
+  margin: 1.5em 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+.docs-content table {
+  margin: 0;
+  border-collapse: collapse;
+  table-layout: fixed;
+  font-size: 0.9375em;
+  line-height: 1.5;
+}
+
+.docs-content td,
+.docs-content th {
+  position: relative;
+  min-width: 1em;
+  padding: 6px 10px;
+  border: 1px solid #d1d5db;
+  vertical-align: top;
+  text-align: left;
+  box-sizing: border-box;
+}
+
+.docs-content th {
+  font-weight: 600;
+  background: #f3f4f6;
+}
+
+.docs-content tbody tr {
+  border-bottom: none;
+}
+
+.docs-content td > *,
+.docs-content th > * {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+.docs-content td > * + *,
+.docs-content th > * + * {
+  margin-top: 0.5em;
+}
+
+/* выделенные ячейки (CellSelection) */
+.docs-content .selectedCell::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  background: rgba(59, 130, 246, 0.15);
+  pointer-events: none;
+}
+
+/* ручка изменения ширины столбца */
+.docs-content .column-resize-handle {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 3px;
+  z-index: 3;
+  background: #3b82f6;
+  pointer-events: none;
+}
+
+.docs-content.resize-cursor {
+  cursor: col-resize;
+}
+
+/* ToDo-списки: ul[data-type=taskList] > li > label + div (у li из node view нет data-type) */
+.docs-content ul[data-type='taskList'] {
+  padding-left: 0;
+  list-style: none;
+}
+
+.docs-content ul[data-type='taskList'] ul[data-type='taskList'] {
+  margin: 0;
+  padding-left: 0.25em;
+}
+
+.docs-content ul[data-type='taskList'] > li {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5em;
+  padding-left: 0;
+}
+
+.docs-content ul[data-type='taskList'] > li::marker {
+  content: none;
+}
+
+.docs-content ul[data-type='taskList'] > li > label {
+  flex: 0 0 auto;
+  margin-top: 0.3em;
+  user-select: none;
+}
+
+.docs-content ul[data-type='taskList'] > li > label input {
+  width: 1.05em;
+  height: 1.05em;
+  margin: 0;
+  cursor: pointer;
+  accent-color: #2563eb;
+}
+
+.docs-content ul[data-type='taskList'] > li > div {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+/* отступы абзаца из prose сдвигали текст ниже чекбокса */
+.docs-content ul[data-type='taskList'] > li > div > p {
+  margin: 0;
+}
+
+.docs-content ul[data-type='taskList'] > li > div > * + * {
+  margin-top: 0.5em;
+}
+
+/* выполненный пункт: зачёркнут и приглушён только собственный текст, не вложенные пункты */
+.docs-content ul[data-type='taskList'] > li[data-checked='true'] > div > p {
+  color: #9ca3af;
+  text-decoration: line-through;
+}
+
+/* нет прав — чекбоксы в просмотре неактивны */
+.docs-tasks-readonly ul[data-type='taskList'] > li > label {
+  pointer-events: none;
+}
+
+.docs-tasks-readonly ul[data-type='taskList'] > li > label input {
+  cursor: default;
+  opacity: 0.6;
+}
+
+/* Блоки-вложения: картинка, видео, аудио, файл */
+.docs-content .docs-media-block {
+  position: relative;
+  margin: 1.25em 0;
+  border-radius: 8px;
+  outline: 2px solid transparent;
+  outline-offset: 4px;
+}
+
+.docs-content .docs-media-block.is-selected {
+  outline-color: #3b82f6;
+}
+
+.docs-content .docs-media-block figure,
+.docs-content .docs-media-block img,
+.docs-content .docs-media-block video {
+  margin: 0;
+}
+
+/* панель действий над выделенным блоком */
+.docs-content .docs-media-block__toolbar {
+  position: absolute;
+  top: -44px;
+  right: 0;
+  z-index: 4;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: 2px 4px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+}
+
+/* у картинки и видео панель поверх угла: над блоком её закрывал бы sticky-тулбар редактора */
+.docs-content .docs-image-block .docs-media-block__toolbar,
+.docs-content .docs-video-block .docs-media-block__toolbar {
+  top: 8px;
+  right: 8px;
+}
+
+.docs-content .docs-media-block__width {
+  min-width: 40px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 12px;
+  line-height: 20px;
+}
+
+.docs-content .docs-media-block__width:hover {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.docs-content .docs-media-block__width.is-active {
+  color: #2563eb;
+  background: rgba(37, 99, 235, 0.1);
+}
+
+.docs-content .docs-media-block__caption {
+  display: block;
+  width: 100%;
+  margin-top: 0.5em;
+  font-size: 0.875em;
+  text-align: center;
+  color: #6b7280;
+}
+
+.docs-content .docs-media-block__caption-input {
+  border: none;
+  outline: none;
+  background: transparent;
+}
+
+.docs-content .docs-media-block__caption-input::placeholder {
+  color: #d1d5db;
+}
+
+/* заглушка на время загрузки и при ошибке */
+.docs-content .docs-media-status {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 160px;
+  border-radius: 6px;
+  background: #f3f4f6;
+  font-size: 0.875em;
+  color: #6b7280;
+}
+
+.docs-content .docs-media-status--error {
+  min-height: 64px;
+  color: #b91c1c;
+  background: #fef2f2;
+}
+
+/* Картинка */
+.docs-content .docs-image {
+  display: flex;
+}
+
+.docs-content .docs-image--left {
+  justify-content: flex-start;
+}
+
+.docs-content .docs-image--center {
+  justify-content: center;
+}
+
+.docs-content .docs-image--right {
+  justify-content: flex-end;
+}
+
+.docs-content .docs-image__box {
+  position: relative;
+  max-width: 100%;
+}
+
+.docs-content .docs-image__img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 6px;
+}
+
+.docs-content .docs-image__resize {
+  position: absolute;
+  top: 50%;
+  width: 8px;
+  height: 48px;
+  margin-top: -24px;
+  border: 1px solid #fff;
+  border-radius: 4px;
+  background: #3b82f6;
+  cursor: ew-resize;
+}
+
+.docs-content .docs-image__resize--left {
+  left: -4px;
+}
+
+.docs-content .docs-image__resize--right {
+  right: -4px;
+}
+
+/* Видео */
+.docs-content .docs-video {
+  display: block;
+  width: 100%;
+  max-height: 70vh;
+  border-radius: 6px;
+  background: #000;
+}
+
+.docs-content .docs-video--status {
+  aspect-ratio: 16 / 9;
+  max-height: none;
+  background: #f3f4f6;
+}
+
+/* Аудио и файл — карточка */
+.docs-content .docs-file-card {
+  padding: 12px 16px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background: #f9fafb;
+}
+
+.docs-content .docs-file-card__head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.docs-content .docs-file-card--audio .docs-file-card__head {
+  margin-bottom: 8px;
+}
+
+.docs-content .docs-file-card__icon {
+  flex: 0 0 auto;
+  color: #6b7280;
+}
+
+.docs-content .docs-file-card__name {
+  overflow: hidden;
+  font-weight: 500;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.docs-content .docs-file-card__size {
+  font-size: 0.8125em;
+  color: #6b7280;
+}
+
+.docs-content .docs-audio-status {
+  min-height: 40px;
+}
+
+/* Плейсхолдер загружаемого файла (декорация ProseMirror) */
+.docs-content .docs-upload-placeholder {
+  margin: 1em 0;
+  padding: 12px 16px;
+  border: 1px dashed #93c5fd;
+  border-radius: 8px;
+  background: #eff6ff;
+  font-size: 0.875em;
+  color: #1e40af;
+  user-select: none;
+}
+
+.docs-content .docs-upload-placeholder__row {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.docs-content .docs-upload-placeholder__name {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.docs-content .docs-upload-placeholder__track {
+  height: 4px;
+  overflow: hidden;
+  border-radius: 2px;
+  background: #dbeafe;
+}
+
+.docs-content .docs-upload-placeholder__bar {
+  width: 0;
+  height: 100%;
+  background: #3b82f6;
+  transition: width 0.2s;
+}
+
+/* Колонка страницы: 900px или во всю ширину (переключатель в DocsLayout) */
+.docs-page {
+  max-width: 900px;
+}
+
+.docs-full-width .docs-page {
+  max-width: none;
+}
+
+/* «/запрос» slash-меню */
+.docs-content .suggestion {
+  border-radius: 4px;
+  background: rgba(59, 130, 246, 0.12);
+}
+
+/* Панели-callout */
+.docs-content .docs-callout {
+  display: flex;
+  gap: 12px;
+  margin: 1.25em 0;
+  padding: 12px 16px;
+  border: 1px solid;
+  border-radius: 8px;
+}
+
+.docs-content .docs-callout__icon {
+  display: flex;
+  flex: 0 0 auto;
+  margin-top: 0.2em;
+  user-select: none;
+}
+
+.docs-content .docs-callout__icon-button {
+  display: flex;
+  margin: -2px;
+  padding: 2px;
+  border-radius: 4px;
+  color: inherit;
+  cursor: pointer;
+}
+
+.docs-content .docs-callout__icon-button:hover {
+  background: rgba(0, 0, 0, 0.06);
+}
+
+.docs-content .docs-callout__content {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+/* блоки лежат во внутреннем div (contentDOM NodeViewContent) */
+.docs-content .docs-callout__content > div > :first-child {
+  margin-top: 0;
+}
+
+.docs-content .docs-callout__content > div > :last-child {
+  margin-bottom: 0;
+}
+
+.docs-content .docs-callout--info {
+  border-color: #bfdbfe;
+  background: #eff6ff;
+}
+
+.docs-content .docs-callout--success {
+  border-color: #bbf7d0;
+  background: #f0fdf4;
+}
+
+.docs-content .docs-callout--warning {
+  border-color: #fde68a;
+  background: #fffbeb;
+}
+
+.docs-content .docs-callout--error {
+  border-color: #fecaca;
+  background: #fef2f2;
+}
+
+/* цвет иконки: в панели, в меню вариантов и в меню вставки */
+.docs-callout--info .docs-callout__icon,
+.docs-callout-icon--info {
+  color: #2563eb;
+}
+
+.docs-callout--success .docs-callout__icon,
+.docs-callout-icon--success {
+  color: #16a34a;
+}
+
+.docs-callout--warning .docs-callout__icon,
+.docs-callout-icon--warning {
+  color: #d97706;
+}
+
+.docs-callout--error .docs-callout__icon,
+.docs-callout-icon--error {
+  color: #dc2626;
+}
+
+/* Тёмная тема */
+.dark .docs-content blockquote {
+  border-left-color: #4b5563;
+  color: #d1d5db;
+}
+
+.dark .docs-content a {
+  color: #60a5fa;
+}
+
+.dark .docs-content code {
+  background: rgba(255, 255, 255, 0.1);
+  color: #ff8a80;
+}
+
+.dark .docs-content pre {
+  background: #111827;
+}
+
+.dark .docs-content pre code {
+  color: inherit;
+}
+
+.dark .docs-content hr {
+  border-color: #374151;
+}
+
+.dark .docs-content h6 {
+  color: #9ca3af;
+}
+
+/* выделение маркером светлое — текст на нём оставляем тёмным */
+.dark .docs-content mark {
+  color: #111827;
+}
+
+.dark .docs-content td,
+.dark .docs-content th {
+  border-color: #4b5563;
+}
+
+.dark .docs-content th {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.dark .docs-content .selectedCell::after {
+  background: rgba(96, 165, 250, 0.2);
+}
+
+.dark .docs-content ul[data-type='taskList'] > li > label input {
+  accent-color: #60a5fa;
+}
+
+.dark .docs-content ul[data-type='taskList'] > li[data-checked='true'] > div > p {
+  color: #6b7280;
+}
+
+.dark .docs-content .docs-media-block__toolbar {
+  border-color: #374151;
+  background: #1f2937;
+}
+
+.dark .docs-content .docs-media-block__width:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.dark .docs-content .docs-media-block__width.is-active {
+  color: #60a5fa;
+  background: rgba(96, 165, 250, 0.15);
+}
+
+.dark .docs-content .docs-media-block__caption {
+  color: #9ca3af;
+}
+
+.dark .docs-content .docs-media-block__caption-input::placeholder {
+  color: #4b5563;
+}
+
+.dark .docs-content .docs-media-status,
+.dark .docs-content .docs-video--status {
+  background: rgba(255, 255, 255, 0.06);
+  color: #9ca3af;
+}
+
+.dark .docs-content .docs-media-status--error {
+  background: rgba(239, 68, 68, 0.12);
+  color: #fca5a5;
+}
+
+.dark .docs-content .docs-file-card {
+  border-color: #374151;
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.dark .docs-content .docs-file-card__icon,
+.dark .docs-content .docs-file-card__size {
+  color: #9ca3af;
+}
+
+.dark .docs-content .docs-upload-placeholder {
+  border-color: #1e40af;
+  background: rgba(59, 130, 246, 0.1);
+  color: #93c5fd;
+}
+
+.dark .docs-content .docs-upload-placeholder__track {
+  background: rgba(59, 130, 246, 0.2);
+}
+
+.dark .docs-content .suggestion {
+  background: rgba(96, 165, 250, 0.2);
+}
+
+.dark .docs-content .docs-callout__icon-button:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.dark .docs-content .docs-callout--info {
+  border-color: rgba(96, 165, 250, 0.35);
+  background: rgba(59, 130, 246, 0.1);
+}
+
+.dark .docs-content .docs-callout--success {
+  border-color: rgba(74, 222, 128, 0.3);
+  background: rgba(34, 197, 94, 0.1);
+}
+
+.dark .docs-content .docs-callout--warning {
+  border-color: rgba(251, 191, 36, 0.35);
+  background: rgba(245, 158, 11, 0.1);
+}
+
+.dark .docs-content .docs-callout--error {
+  border-color: rgba(248, 113, 113, 0.35);
+  background: rgba(239, 68, 68, 0.1);
+}
+
+.dark .docs-callout--info .docs-callout__icon,
+.dark .docs-callout-icon--info {
+  color: #60a5fa;
+}
+
+.dark .docs-callout--success .docs-callout__icon,
+.dark .docs-callout-icon--success {
+  color: #4ade80;
+}
+
+.dark .docs-callout--warning .docs-callout__icon,
+.dark .docs-callout-icon--warning {
+  color: #fbbf24;
+}
+
+.dark .docs-callout--error .docs-callout__icon,
+.dark .docs-callout-icon--error {
+  color: #f87171;
+}
