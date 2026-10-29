@@ -8,6 +8,8 @@ import { registerErrorHandlers } from './errors';
 import { authenticatePlugin } from './plugins/authenticate';
 import { authRoutes } from './routes/auth';
 import { healthRoutes } from './routes/health';
+import { pageRoutes } from './routes/pages';
+import { spaceRoutes } from './routes/spaces';
 
 declare module 'fastify' {
   interface FastifyInstance {
@@ -15,8 +17,12 @@ declare module 'fastify' {
   }
 }
 
+// Лимит JSON-тела запроса; файлы идут отдельными multipart-маршрутами.
+const MAX_JSON_BODY_BYTES = 5 * 1024 * 1024;
+
 export const buildApp = (config: Pick<Config, 'NODE_ENV' | 'LOG_LEVEL' | 'JWT_SECRET' | 'AUTH_RATE_LIMIT_MAX'>, db: Db) => {
   const app = Fastify({
+    bodyLimit: MAX_JSON_BODY_BYTES,
     logger: {
       level: config.LOG_LEVEL,
       ...(config.NODE_ENV === 'development' && { transport: { target: 'pino-pretty' } }),
@@ -39,6 +45,8 @@ export const buildApp = (config: Pick<Config, 'NODE_ENV' | 'LOG_LEVEL' | 'JWT_SE
     secureCookies: config.NODE_ENV === 'production',
     rateLimitMax: config.AUTH_RATE_LIMIT_MAX,
   });
+  app.register(spaceRoutes);
+  app.register(pageRoutes);
 
   return app;
 };
