@@ -180,3 +180,53 @@ describe('отдача вложений', () => {
     expect((await download(owner, att.id)).statusCode).toBe(404);
   });
 });
+
+describe('подписанные ссылки', () => {
+  const signedUrl = (headers: Headers, id: string) =>
+    env.app.inject({ method: 'POST', url: `/docs/Attachments/${id}/SignedUrl`, headers });
+
+  it('отдаёт содержимое и Range по ссылке без заголовка Authorization', async () => {
+    const owner = await signUp();
+    const { page } = await createPage(owner);
+    const att = await uploadFile(owner, page.id, 'clip.mp4', 'video/mp4');
+
+    const res = await signedUrl(owner, att.id);
+    expect(res.statusCode).toBe(200);
+    const { url } = res.json();
+    expect(url).toContain(`/docs/Attachments/${att.id}/Content?token=`);
+
+    const full = await env.app.inject({ method: 'GET', url });
+    expect(full.statusCode).toBe(200);
+    expect(full.rawPayload.equals(DATA)).toBe(true);
+    const part = await env.app.inject({ method: 'GET', url, headers: { range: 'bytes=2-5' } });
+    expect(part.statusCode).toBe(206);
+    expect(part.body).toBe('2345');
+  });
+
+  it('не выдаёт ссылку постороннему; токен не подходит к другому вложению и не заменяет access-токен', async () => {
+    const owner = await signUp();
+    const stranger = await signUp();
+    const { page } = await createPage(owner);
+    const one = await uploadFile(owner, page.id);
+    const two = await uploadFile(owner, page.id);
+
+    expect((await signedUrl(stranger, one.id)).statusCode).toBe(404);
+    expect((await env.app.inject({ method: 'POST', url: `/docs/Attachments/${one.id}/SignedUrl` })).statusCode).toBe(401);
+
+    const { url } = (await signedUrl(owner, one.id)).json();
+    const token = new URL(url, 'http://x').searchParams.get('token')!;
+    const other = await env.app.inject({ method: 'GET', url: `/docs/Attachments/${two.id}/Content?token=${token}` });
+    expect(other.statusCode).toBe(401);
+    const forged = await env.app.inject({ method: 'GET', url: `/docs/Attachments/${one.id}/Content?token=garbage` });
+    expect(forged.statusCode).toBe(401);
+    const asAccess = await env.app.inject({ method: 'GET', url: '/auth/me', headers: { authorization: `Bearer ${token}` } });
+    expect(asAccess.statusCode).toBe(401);
+  });
+
+  it('без токена и без авторизации содержимое недоступно', async () => {
+    const owner = await signUp();
+    const { page } = await createPage(owner);
+    const att = await uploadFile(owner, page.id);
+    expect((await env.app.inject({ method: 'GET', url: `/docs/Attachments/${att.id}/Content` })).statusCode).toBe(401);
+  });
+});

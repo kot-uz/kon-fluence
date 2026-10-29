@@ -5,6 +5,9 @@ export {
   useCreateSpaceMutation,
   useRenameSpaceMutation,
   useDeleteSpaceMutation,
+  useGetSpaceMembersQuery,
+  useAddSpaceMemberMutation,
+  useRemoveSpaceMemberMutation,
 } from './api/spacesApi';
 export { SPACE_TYPES, DOCS_MODE, DOCS_BASE_PATH } from './constants';
 export { default as DocsAppConfig } from './DocsAppConfig';
@@ -18,5 +21,7 @@ export type {
   DocsUser,
   Space,
   SpaceInfo,
+  SpaceMember,
+  SpaceRole,
   SpaceType,
 } from './types';

@@ -25,8 +25,7 @@ const realUploadAttachment = async ({
   return data;
 };
 
-// Blob целиком: <video src> не может передать заголовок авторизации.
-// Когда появится бекенд с Range и cookie/подписанными ссылками, видео/аудио лучше отдавать по URL.
+// Blob целиком: <img src> не может передать заголовок авторизации.
 const realGetAttachmentBlob = async (id: string): Promise<Blob> => {
   const { data } = await httpClient.get<Blob>(`/docs/Attachments/${id}/Content`, {
     responseType: 'blob',
@@ -41,6 +40,20 @@ export const uploadAttachment = (args: UploadAttachmentArgs) =>
 /** getAttachmentBlob(id) → Blob */
 export const getAttachmentBlob = (id: string) =>
   isLocalMode() ? localGetAttachmentBlob(id) : realGetAttachmentBlob(id);
+
+/** Ссылка на вложение для <video>/<audio>: потоковая (Range) и подписанная в облаке, objectURL на устройстве. */
+export interface MediaUrl {
+  url: string;
+  /** Момент, после которого ссылку нужно запросить заново; null — не истекает. */
+  expiresAt: number | null;
+}
+
+export const getAttachmentMediaUrl = async (id: string): Promise<MediaUrl> => {
+  if (isLocalMode()) return { url: URL.createObjectURL(await localGetAttachmentBlob(id)), expiresAt: null };
+  const { data } = await httpClient.post<{ url: string; expiresAt: string }>(`/docs/Attachments/${id}/SignedUrl`);
+  const base = (httpClient.defaults.baseURL || '').replace(/\/$/, '');
+  return { url: `${base}${data.url}`, expiresAt: Date.parse(data.expiresAt) };
+};
 
 /** Сохраняет вложение на диск через временную ссылку. */
 export const downloadAttachment = async (id: string, fileName?: string) => {

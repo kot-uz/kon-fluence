@@ -10,7 +10,7 @@ import type { MediaViewProps } from './MediaBlockFrame';
 
 const AudioBlockView = ({ node, editor, selected, deleteNode, getPos }: MediaViewProps) => {
   const { fileId, fileName } = node.attrs;
-  const { url, isError } = useAttachmentUrl(fileId);
+  const { url, isError } = useAttachmentUrl(fileId, true);
   const audioRef = useStopEditorMouseDown<HTMLAudioElement>(() => {
     if (editor.isEditable) selectNode(editor, getPos);
   });

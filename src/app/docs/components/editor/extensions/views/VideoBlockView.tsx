@@ -17,7 +17,7 @@ const VideoBlockView = ({
   getPos,
 }: MediaViewProps) => {
   const { fileId, fileName, caption } = node.attrs;
-  const { url, isError } = useAttachmentUrl(fileId);
+  const { url, isError } = useAttachmentUrl(fileId, true);
   // элементы управления видео должны работать и в редактировании
   const videoRef = useStopEditorMouseDown<HTMLVideoElement>(() => {
     if (editor.isEditable) selectNode(editor, getPos);

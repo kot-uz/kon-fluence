@@ -10,6 +10,8 @@ export type {
   DocsTreeNode,
   Space,
   SpaceKey,
+  SpaceMember,
+  SpaceRole,
   SpaceType,
 } from '@kon-fluence/shared';
 

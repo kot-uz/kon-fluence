@@ -65,4 +65,16 @@ export interface Space {
   id: string;
   title: string;
   createdAt: string | null;
+  /** Роль текущего пользователя; приходит только от бекенда. */
+  role?: SpaceRole;
+}
+
+export type SpaceRole = 'owner' | 'editor' | 'viewer';
+
+/** Участник пространства (GET /Spaces/{id}/Members). */
+export interface SpaceMember {
+  userId: string;
+  email: string;
+  fullName: string;
+  role: SpaceRole;
 }

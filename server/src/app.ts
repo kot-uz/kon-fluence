@@ -10,6 +10,7 @@ import { attachmentRoutes } from './routes/attachments';
 import { authRoutes } from './routes/auth';
 import { healthRoutes } from './routes/health';
 import { importRoutes } from './routes/imports';
+import { memberRoutes } from './routes/members';
 import { pageRoutes } from './routes/pages';
 import { spaceRoutes } from './routes/spaces';
 import type { Storage } from './storage/storage';
@@ -51,8 +52,9 @@ export const buildApp = (config: Pick<Config, 'NODE_ENV' | 'LOG_LEVEL' | 'JWT_SE
     rateLimitMax: config.AUTH_RATE_LIMIT_MAX,
   });
   app.register(spaceRoutes);
+  app.register(memberRoutes);
   app.register(pageRoutes);
-  app.register(attachmentRoutes);
+  app.register(attachmentRoutes, { jwtSecret: config.JWT_SECRET });
   app.register(importRoutes);
 
   return app;

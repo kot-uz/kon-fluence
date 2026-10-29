@@ -27,8 +27,8 @@ export const useSpaceInfo = (spaceType: string | undefined, spaceId: string | un
       notFound: false,
       title: space.title,
       backUrl: '/',
-      // приложение локальное и однопользовательское: прав на чтение-без-записи нет
-      canEdit: true,
+      // локальные пространства без роли — однопользовательские; в облаке читатель не редактирует
+      canEdit: space.role !== 'viewer',
     };
   }, [spaceType, space, isLoading]);
 };

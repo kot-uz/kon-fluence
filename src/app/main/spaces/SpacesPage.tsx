@@ -11,19 +11,23 @@ import {
   MenuItem,
   Typography,
 } from '@mui/material';
-import { Add, Delete, Description, Edit, MoreVert } from '@mui/icons-material';
+import { Add, Delete, Description, Edit, Group, MoreVert } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { showMessage } from 'app/store/layout/messageSlice';
 import { DOCS_BASE_PATH, SPACE_TYPES, useDeleteSpaceMutation, useGetSpacesQuery } from 'app/docs';
 import type { Space } from 'app/docs';
 import ConfirmDialog from 'app/shared-components/ConfirmDialog';
+import { useAppSelector } from 'app/store';
+import { selectStorageMode } from 'app/store/storageModeSlice';
+import SpaceMembersDialog from './SpaceMembersDialog';
 import SpaceTitleDialog from './SpaceTitleDialog';
 
 /** Открытый диалог: создание нового пространства либо действие над существующим. */
 type DialogState =
   | { mode: 'create' }
   | { mode: 'rename'; space: Space }
-  | { mode: 'delete'; space: Space };
+  | { mode: 'delete'; space: Space }
+  | { mode: 'members'; space: Space };
 
 // Главная страница приложения: список пространств документации.
 const SpacesPage = () => {
@@ -31,6 +35,7 @@ const SpacesPage = () => {
   const dispatch = useDispatch();
   const { data: spaces = [], isLoading } = useGetSpacesQuery();
   const [deleteSpace] = useDeleteSpaceMutation();
+  const isCloud = useAppSelector(selectStorageMode) === 'cloud';
   const [dialog, setDialog] = useState<DialogState | null>(null);
   const [menu, setMenu] = useState<{ anchor: HTMLElement; space: Space } | null>(null);
 
@@ -99,6 +104,17 @@ const SpacesPage = () => {
       </div>
 
       <Menu anchorEl={menu?.anchor} open={!!menu} onClose={closeMenu}>
+        {isCloud && (
+          <MenuItem
+            onClick={() => {
+              if (menu) setDialog({ mode: 'members', space: menu.space });
+              closeMenu();
+            }}
+          >
+            <Group fontSize="small" className="mr-12" />
+            {t('AppSpaceMembers')}
+          </MenuItem>
+        )}
         <MenuItem
           onClick={() => {
             if (menu) setDialog({ mode: 'rename', space: menu.space });
@@ -127,7 +143,10 @@ const SpacesPage = () => {
           onClose={() => setDialog(null)}
         />
       )}
-      {dialog && dialog.mode !== 'delete' && (
+      {dialog?.mode === 'members' && (
+        <SpaceMembersDialog space={dialog.space} onClose={() => setDialog(null)} />
+      )}
+      {dialog && (dialog.mode === 'create' || dialog.mode === 'rename') && (
         <SpaceTitleDialog {...dialog} onClose={() => setDialog(null)} />
       )}
     </div>
