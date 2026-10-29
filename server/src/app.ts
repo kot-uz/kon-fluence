@@ -9,6 +9,7 @@ import { authenticatePlugin } from './plugins/authenticate';
 import { attachmentRoutes } from './routes/attachments';
 import { authRoutes } from './routes/auth';
 import { healthRoutes } from './routes/health';
+import { importRoutes } from './routes/imports';
 import { pageRoutes } from './routes/pages';
 import { spaceRoutes } from './routes/spaces';
 import type { Storage } from './storage/storage';
@@ -52,6 +53,7 @@ export const buildApp = (config: Pick<Config, 'NODE_ENV' | 'LOG_LEVEL' | 'JWT_SE
   app.register(spaceRoutes);
   app.register(pageRoutes);
   app.register(attachmentRoutes);
+  app.register(importRoutes);
 
   return app;
 };
