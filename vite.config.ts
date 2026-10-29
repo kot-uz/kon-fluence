@@ -8,7 +8,6 @@ const resolvePath = (relative: string) => fileURLToPath(new URL(relative, import
 export default defineConfig(({ mode }) => {
   // Значения по умолчанию обязательны: незаменённый process.env.* упал бы в рантайме.
   const env: Record<string, string> = {
-    REACT_APP_DOCS_MOCK: 'true',
     REACT_APP_API_URL: '',
     ...loadEnv(mode, process.cwd(), 'REACT_APP_'),
   };

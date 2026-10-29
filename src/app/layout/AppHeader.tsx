@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import {
   AppBar,
@@ -10,13 +10,22 @@ import {
   DialogContent,
   DialogTitle,
   IconButton,
+  Menu,
   MenuItem,
   TextField,
   Toolbar,
   Tooltip,
   Typography,
 } from '@mui/material';
-import { DarkMode, LightMode, MenuBook, Person } from '@mui/icons-material';
+import {
+  ArrowDropDown,
+  Cloud,
+  Computer,
+  DarkMode,
+  LightMode,
+  MenuBook,
+  Person,
+} from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useAppSelector } from 'app/store';
 import { LANGUAGES, selectLanguage, setLanguage } from 'app/store/i18nSlice';
@@ -25,7 +34,15 @@ import { selectUser, setUserName } from 'app/store/userSlice';
 import { showMessage } from 'app/store/layout/messageSlice';
 import { useThemeMode } from 'app/theme/AppThemeProvider';
 import ConfirmDialog from 'app/shared-components/ConfirmDialog';
-import { isDocsMockEnabled, resetDocsMockData } from 'app/docs';
+import {
+  STORAGE_MODES,
+  isCloudAvailable,
+  selectStorageMode,
+  setStorageMode,
+} from 'app/store/storageModeSlice';
+import type { StorageMode } from 'app/store/storageModeSlice';
+import { docsHostApi } from 'app/services/docs/docsHostApi';
+import { resetDocsLocalData } from 'app/docs';
 
 // Шапка приложения.
 const AppHeader = () => {
@@ -34,6 +51,10 @@ const AppHeader = () => {
   const { isDark, toggle } = useThemeMode();
   const language = useAppSelector(selectLanguage);
   const user = useAppSelector(selectUser);
+  const storageMode = useAppSelector(selectStorageMode);
+  const isLocalMode = storageMode === 'local';
+  const navigate = useNavigate();
+  const [modeAnchor, setModeAnchor] = useState<HTMLElement | null>(null);
   const [userDialogOpen, setUserDialogOpen] = useState(false);
   const [resetConfirmOpen, setResetConfirmOpen] = useState(false);
   const [name, setName] = useState(user.fio);
@@ -49,8 +70,17 @@ const AppHeader = () => {
     setUserDialogOpen(false);
   };
 
+  const changeMode = (mode: StorageMode) => {
+    setModeAnchor(null);
+    if (mode === storageMode) return;
+    dispatch(setStorageMode(mode));
+    // кэш хранит данные прежнего режима
+    dispatch(docsHostApi.util.resetApiState());
+    navigate('/');
+  };
+
   const resetData = async () => {
-    await resetDocsMockData();
+    await resetDocsLocalData();
     // проще перезагрузить страницу, чем сбрасывать кэш RTK Query и состояние редактора
     window.location.reload();
   };
@@ -70,9 +100,28 @@ const AppHeader = () => {
             {t('AppTitle')}
           </Typography>
 
-          {isDocsMockEnabled && (
-            <Chip size="small" variant="outlined" color="warning" label={t('AppMockMode')} />
-          )}
+          <Tooltip title={t('AppStorageMode')}>
+            <Chip
+              size="small"
+              variant="outlined"
+              color={isLocalMode ? 'warning' : 'primary'}
+              icon={isLocalMode ? <Computer /> : <Cloud />}
+              label={t(isLocalMode ? 'AppStorageLocal' : 'AppStorageCloud')}
+              // без адреса бекенда выбирать не из чего
+              onClick={isCloudAvailable ? (event) => setModeAnchor(event.currentTarget) : undefined}
+              onDelete={
+                isCloudAvailable ? (event) => setModeAnchor(event.currentTarget) : undefined
+              }
+              deleteIcon={<ArrowDropDown />}
+            />
+          </Tooltip>
+          <Menu anchorEl={modeAnchor} open={!!modeAnchor} onClose={() => setModeAnchor(null)}>
+            {STORAGE_MODES.map((mode) => (
+              <MenuItem key={mode} selected={mode === storageMode} onClick={() => changeMode(mode)}>
+                {t(mode === 'local' ? 'AppStorageLocal' : 'AppStorageCloud')}
+              </MenuItem>
+            ))}
+          </Menu>
 
           <div className="flex-1" />
 
@@ -125,7 +174,7 @@ const AppHeader = () => {
           />
         </DialogContent>
         <DialogActions className="justify-between">
-          {isDocsMockEnabled ? (
+          {isLocalMode ? (
             <Button color="error" onClick={() => setResetConfirmOpen(true)}>
               {t('AppResetData')}
             </Button>

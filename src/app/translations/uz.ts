@@ -20,7 +20,10 @@ const locale = {
   AppResetData: "Demo ma'lumotlarni tiklash",
   AppResetDataConfirm: "Barcha sahifa va ilovalar brauzerdan o'chirilsinmi? Maydonlar demo sahifalar bilan qaytadan to'ldiriladi.",
   AppResetDataDone: "Demo ma'lumotlar tiklandi",
-  AppMockMode: "Demo rejim: ma'lumotlar brauzerda saqlanadi",
+  AppSpaceError: "Maydon bilan amalni bajarib bo'lmadi",
+  AppStorageMode: "Ma'lumotlar qayerda saqlanadi",
+  AppStorageLocal: "Shu qurilmada",
+  AppStorageCloud: "Bulutda",
   AppBackToSpaces: "Maydonlar ro'yxatiga",
 
   // ключи модуля документации

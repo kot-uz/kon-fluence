@@ -68,6 +68,13 @@ export interface DocsUser {
   fullName: string | undefined;
 }
 
+/** Пространство документации из списка (GET /Spaces). */
+export interface Space {
+  id: string;
+  title: string;
+  createdAt: string | null;
+}
+
 /** Информация о пространстве для отдельного роута (см. adapters/spaces.useSpaceInfo). */
 export interface SpaceInfo {
   isLoading: boolean;

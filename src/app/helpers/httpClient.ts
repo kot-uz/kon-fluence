@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-// Базовый URL бекенда. Нужен, только когда моки выключены (REACT_APP_DOCS_MOCK=false).
+// Базовый URL бекенда. Нужен только для облачного режима.
 const baseURL = process.env.REACT_APP_API_URL;
 
 if (baseURL) {

@@ -8,3 +8,7 @@ dist
 .DS_Store
 .idea
 .vscode
+
+# Локальные файлы для работы с Claude
+PLAN.md
+CLAUDE.md

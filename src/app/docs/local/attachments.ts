@@ -2,7 +2,7 @@ import { nanoid } from 'nanoid';
 import type { Attachment } from '../types';
 import { getDb } from './db';
 import type { StoredAttachment } from './db';
-import { MockHttpError } from './handlers';
+import { LocalHttpError } from './handlers';
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -20,13 +20,13 @@ export interface UploadAttachmentArgs {
 const toAttachment = ({ blob: _blob, ...attachment }: StoredAttachment): Attachment => attachment;
 
 // Аналог POST /Attachments: файл хранится в IndexedDB как Blob.
-export const mockUploadAttachment = async ({
+export const localUploadAttachment = async ({
   file,
   pageId,
   onProgress,
 }: UploadAttachmentArgs): Promise<Attachment> => {
   const db = await getDb();
-  if (!(await db.get('pages', pageId))) throw new MockHttpError(404, 'Page not found');
+  if (!(await db.get('pages', pageId))) throw new LocalHttpError(404, 'Page not found');
 
   const duration = Math.min(4000, Math.max(500, file.size / BYTES_PER_MS));
   for (let step = 1; step <= PROGRESS_STEPS; step += 1) {
@@ -49,8 +49,8 @@ export const mockUploadAttachment = async ({
 };
 
 // Аналог GET /Attachments/{id}/Content
-export const mockGetAttachmentBlob = async (id: string): Promise<Blob> => {
+export const localGetAttachmentBlob = async (id: string): Promise<Blob> => {
   const record = await (await getDb()).get('attachments', id);
-  if (!record) throw new MockHttpError(404, 'Attachment not found');
+  if (!record) throw new LocalHttpError(404, 'Attachment not found');
   return record.blob;
 };

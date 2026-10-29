@@ -1,8 +1,11 @@
 import { httpClient } from '../adapters/transport';
-import { mockGetAttachmentBlob, mockUploadAttachment } from '../mock/attachments';
-import type { UploadAttachmentArgs } from '../mock/attachments';
+import { localGetAttachmentBlob, localUploadAttachment } from '../local/attachments';
+import type { UploadAttachmentArgs } from '../local/attachments';
 import type { Attachment } from '../types';
-import { isDocsMockEnabled } from './docsBaseQuery';
+import store from 'app/store';
+import { selectStorageMode } from 'app/store/storageModeSlice';
+
+const isLocalMode = () => selectStorageMode(store.getState()) === 'local';
 
 // Загрузка и скачивание вложений идут мимо RTK Query: нужны прогресс загрузки и Blob в ответе.
 
@@ -32,10 +35,12 @@ const realGetAttachmentBlob = async (id: string): Promise<Blob> => {
 };
 
 /** uploadAttachment({ file, pageId, onProgress(percent) }) → Attachment */
-export const uploadAttachment = isDocsMockEnabled ? mockUploadAttachment : realUploadAttachment;
+export const uploadAttachment = (args: UploadAttachmentArgs) =>
+  isLocalMode() ? localUploadAttachment(args) : realUploadAttachment(args);
 
 /** getAttachmentBlob(id) → Blob */
-export const getAttachmentBlob = isDocsMockEnabled ? mockGetAttachmentBlob : realGetAttachmentBlob;
+export const getAttachmentBlob = (id: string) =>
+  isLocalMode() ? localGetAttachmentBlob(id) : realGetAttachmentBlob(id);
 
 /** Сохраняет вложение на диск через временную ссылку. */
 export const downloadAttachment = async (id: string, fileName?: string) => {

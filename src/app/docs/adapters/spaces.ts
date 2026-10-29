@@ -1,9 +1,9 @@
 // Единственная точка, где модуль документации знает о сущностях, к которым привязаны пространства.
-// Пространства локальные — их список ведёт app/services/spaces/spacesRegistry.
+// Список пространств отдаёт API (локальные обработчики или бекенд).
 import { useMemo } from 'react';
 import { useAppSelector } from 'app/store';
 import { selectUser } from 'app/store/userSlice';
-import { useSpace } from 'app/services/spaces/spacesRegistry';
+import { useGetSpacesQuery } from '../api/spacesApi';
 import { SPACE_TYPES } from '../constants';
 import type { DocsUser, SpaceInfo } from '../types';
 
@@ -12,9 +12,11 @@ import type { DocsUser, SpaceInfo } from '../types';
  * Хуки вызываются безусловно (правила хуков), неподходящий spaceType отсеивается после.
  */
 export const useSpaceInfo = (spaceType: string | undefined, spaceId: string | undefined): SpaceInfo => {
-  const space = useSpace(spaceId);
+  const { data: spaces, isLoading } = useGetSpacesQuery();
+  const space = spaces?.find((item) => item.id === spaceId);
 
   return useMemo(() => {
+    if (isLoading) return { isLoading: true, notFound: false };
     if (spaceType !== SPACE_TYPES.SPACE || !space) {
       return { isLoading: false, notFound: true };
     }
@@ -26,7 +28,7 @@ export const useSpaceInfo = (spaceType: string | undefined, spaceId: string | un
       // приложение локальное и однопользовательское: прав на чтение-без-записи нет
       canEdit: true,
     };
-  }, [spaceType, space]);
+  }, [spaceType, space, isLoading]);
 };
 
 export const useCurrentUser = (): DocsUser => {

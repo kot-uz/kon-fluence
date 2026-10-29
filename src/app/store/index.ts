@@ -6,6 +6,7 @@ import { docsHostApi } from 'app/services/docs/docsHostApi';
 import layout from './layout';
 import user from './userSlice';
 import i18n from './i18nSlice';
+import storageMode from './storageModeSlice';
 
 const store = configureStore({
   reducer: {
@@ -13,6 +14,7 @@ const store = configureStore({
     layout,
     user,
     i18n,
+    storageMode,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

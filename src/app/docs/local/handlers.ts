@@ -1,36 +1,44 @@
 import { nanoid } from 'nanoid';
 import type { IDBPDatabase } from 'idb';
 import type { User } from 'app/store/userSlice';
-import { EMPTY_DOC, getSpaceKey } from '../constants';
+import { EMPTY_DOC, SPACE_TYPES, getSpaceKey } from '../constants';
 import { setTaskChecked } from '../utils/tasks';
 import { getChildren, getDescendantIds, getLastPosition } from '../utils/tree';
-import type { Author, DocContent, DocsPage, DocsTreeItem, SpaceKey, SpaceType } from '../types';
+import type {
+  Author,
+  DocContent,
+  DocsPage,
+  DocsTreeItem,
+  Space,
+  SpaceKey,
+  SpaceType,
+} from '../types';
 import { getDb } from './db';
-import type { DocsMockDb, StoredPage } from './db';
+import type { DocsLocalDb, StoredPage } from './db';
 import { getSeedPages } from './seed';
 
-type Db = IDBPDatabase<DocsMockDb>;
+type Db = IDBPDatabase<DocsLocalDb>;
 
 /** Запрос к моку: группы из URL, тело и текущий пользователь из store. */
-export interface MockRequest<Body = unknown> {
+export interface LocalRequest<Body = unknown> {
   params: string[];
   body: Body;
   user?: User;
 }
 
-type MockHandler<Body> = (request: MockRequest<Body>) => Promise<unknown>;
+type LocalHandler<Body> = (request: LocalRequest<Body>) => Promise<unknown>;
 
 /** Роут мока: метод, шаблон URL и обработчик. */
-export type MockRoute = [method: string, pattern: RegExp, handler: MockHandler<never>];
+export type LocalRoute = [method: string, pattern: RegExp, handler: LocalHandler<never>];
 
 // Тело своё у каждого обработчика; роут хранит его как never, чтобы оставаться одним типом.
-const route = <Body>(method: string, pattern: RegExp, handler: MockHandler<Body>): MockRoute => [
+const route = <Body>(method: string, pattern: RegExp, handler: LocalHandler<Body>): LocalRoute => [
   method,
   pattern,
   handler,
 ];
 
-export class MockHttpError extends Error {
+export class LocalHttpError extends Error {
   readonly status: number;
 
   readonly data: unknown;
@@ -56,11 +64,11 @@ const toTreeItem = ({ id, parentId, position, title }: StoredPage): DocsTreeItem
   title,
 });
 
-const toPage = ({ spaceKey: _spaceKey, ...page }: StoredPage): DocsPage => page;
+const toPage = ({ spaceKey: _spaceKey, seed: _seed, ...page }: StoredPage): DocsPage => page;
 
 const getPageOrThrow = async (db: Db, id: string) => {
   const page = await db.get('pages', id);
-  if (!page) throw new MockHttpError(404, 'Page not found');
+  if (!page) throw new LocalHttpError(404, 'Page not found');
   return page;
 };
 
@@ -110,20 +118,23 @@ const seedSpaceIfNeeded = async (
     return;
   }
   getSeedPages().forEach((seed, index) =>
-    tx.objectStore('pages').put(buildPage({ ...seed, spaceType, spaceId, position: index + 1 }, user))
+    tx.objectStore('pages').put({
+      ...buildPage({ ...seed, spaceType, spaceId, position: index + 1 }, user),
+      seed: true,
+    })
   );
   tx.objectStore('spaces').put({ key, createdAt: now() });
   await tx.done;
 };
 
-const getTree = async ({ params: [spaceType, spaceId], user }: MockRequest) => {
+const getTree = async ({ params: [spaceType, spaceId], user }: LocalRequest) => {
   const db = await getDb();
   await seedSpaceIfNeeded(db, spaceType as SpaceType, spaceId, user);
   const pages = await getSpacePages(db, getSpaceKey(spaceType as SpaceType, spaceId));
   return pages.map(toTreeItem).sort((a, b) => a.position - b.position);
 };
 
-const getPage = async ({ params: [id] }: MockRequest) =>
+const getPage = async ({ params: [id] }: LocalRequest) =>
   toPage(await getPageOrThrow(await getDb(), id));
 
 /** Тело POST /Pages. */
@@ -135,13 +146,13 @@ interface CreatePageBody {
   content?: DocContent;
 }
 
-const createPage = async ({ body, user }: MockRequest<CreatePageBody>) => {
+const createPage = async ({ body, user }: LocalRequest<CreatePageBody>) => {
   const { spaceType, spaceId, parentId = null } = body;
-  if (!body.title?.trim()) throw new MockHttpError(400, 'Title is required');
+  if (!body.title?.trim()) throw new LocalHttpError(400, 'Title is required');
   const db = await getDb();
   const spacePages = await getSpacePages(db, getSpaceKey(spaceType, spaceId));
   if (parentId && !spacePages.some((page) => page.id === parentId)) {
-    throw new MockHttpError(400, 'Parent page not found');
+    throw new LocalHttpError(400, 'Parent page not found');
   }
   const page = buildPage({ ...body, position: getLastPosition(spacePages, parentId) + 1 }, user);
   await db.put('pages', page);
@@ -155,11 +166,11 @@ interface UpdatePageBody {
   content?: DocContent;
 }
 
-const updatePage = async ({ params: [id], body, user }: MockRequest<UpdatePageBody>) => {
+const updatePage = async ({ params: [id], body, user }: LocalRequest<UpdatePageBody>) => {
   const db = await getDb();
   const page = await getPageOrThrow(db, id);
   if (body.version !== page.version) {
-    throw new MockHttpError(409, 'Page was changed by another user', toPage(page));
+    throw new LocalHttpError(409, 'Page was changed by another user', toPage(page));
   }
   const updated: StoredPage = {
     ...page,
@@ -173,8 +184,8 @@ const updatePage = async ({ params: [id], body, user }: MockRequest<UpdatePageBo
   return toPage(updated);
 };
 
-const renamePage = async ({ params: [id], body, user }: MockRequest<{ title?: string }>) => {
-  if (!body.title?.trim()) throw new MockHttpError(400, 'Title is required');
+const renamePage = async ({ params: [id], body, user }: LocalRequest<{ title?: string }>) => {
+  if (!body.title?.trim()) throw new LocalHttpError(400, 'Title is required');
   const db = await getDb();
   const page = await getPageOrThrow(db, id);
   const updated: StoredPage = {
@@ -193,13 +204,13 @@ const toggleTask = async ({
   params: [id, taskId],
   body,
   user,
-}: MockRequest<{ checked?: boolean }>) => {
+}: LocalRequest<{ checked?: boolean }>) => {
   const db = await getDb();
   const tx = db.transaction('pages', 'readwrite');
   const page = await tx.store.get(id);
-  if (!page) throw new MockHttpError(404, 'Page not found');
+  if (!page) throw new LocalHttpError(404, 'Page not found');
   if (!setTaskChecked(page.content, taskId, !!body.checked)) {
-    throw new MockHttpError(404, 'Task not found');
+    throw new LocalHttpError(404, 'Task not found');
   }
   const updated: StoredPage = {
     ...page,
@@ -218,16 +229,16 @@ interface MovePageBody {
   position?: number;
 }
 
-const movePage = async ({ params: [id], body }: MockRequest<MovePageBody>) => {
+const movePage = async ({ params: [id], body }: LocalRequest<MovePageBody>) => {
   const db = await getDb();
   const page = await getPageOrThrow(db, id);
   const parentId = body.parentId || null;
   const spacePages = await getSpacePages(db, page.spaceKey);
   if (parentId === id || (parentId && getDescendantIds(spacePages, id).has(parentId))) {
-    throw new MockHttpError(400, 'Cannot move a page into itself or its subpage');
+    throw new LocalHttpError(400, 'Cannot move a page into itself or its subpage');
   }
   if (parentId && !spacePages.some((item) => item.id === parentId)) {
-    throw new MockHttpError(400, 'Parent page not found');
+    throw new LocalHttpError(400, 'Parent page not found');
   }
   const siblings = getChildren(spacePages, parentId).filter((item) => item.id !== id);
   const position =
@@ -237,7 +248,7 @@ const movePage = async ({ params: [id], body }: MockRequest<MovePageBody>) => {
   return toPage(updated);
 };
 
-const deletePage = async ({ params: [id] }: MockRequest) => {
+const deletePage = async ({ params: [id] }: LocalRequest) => {
   const db = await getDb();
   const page = await getPageOrThrow(db, id);
   const spacePages = await getSpacePages(db, page.spaceKey);
@@ -255,7 +266,53 @@ const deletePage = async ({ params: [id] }: MockRequest) => {
   return { deletedIds: ids };
 };
 
-export const routes: MockRoute[] = [
+const getSpaces = async () => (await (await getDb()).getAll('spaceList')) as Space[];
+
+const getSpaceTitle = (body: { title?: string }) => {
+  const title = body.title?.trim();
+  if (!title) throw new LocalHttpError(400, 'Title is required');
+  return title;
+};
+
+const createSpace = async ({ body }: LocalRequest<{ title?: string }>) => {
+  const space: Space = { id: nanoid(), title: getSpaceTitle(body), createdAt: now() };
+  await (await getDb()).put('spaceList', space);
+  return space;
+};
+
+const renameSpace = async ({ params: [id], body }: LocalRequest<{ title?: string }>) => {
+  const db = await getDb();
+  const space = await db.get('spaceList', id);
+  if (!space) throw new LocalHttpError(404, 'Space not found');
+  const updated = { ...space, title: getSpaceTitle(body) };
+  await db.put('spaceList', updated);
+  return updated;
+};
+
+/** Удаляет пространство вместе со страницами и вложениями. */
+const deleteSpace = async ({ params: [id] }: LocalRequest) => {
+  const db = await getDb();
+  const key = getSpaceKey(SPACE_TYPES.SPACE, id);
+  const tx = db.transaction(['spaceList', 'spaces', 'pages', 'attachments'], 'readwrite');
+  const pageIds = await tx.objectStore('pages').index('spaceKey').getAllKeys(key);
+  const attachments = tx.objectStore('attachments');
+  await Promise.all(
+    pageIds.map(async (pageId) => {
+      const keys = await attachments.index('pageId').getAllKeys(pageId);
+      await Promise.all(keys.map((attachmentKey) => attachments.delete(attachmentKey)));
+      await tx.objectStore('pages').delete(pageId);
+    })
+  );
+  await tx.objectStore('spaces').delete(key);
+  await tx.objectStore('spaceList').delete(id);
+  await tx.done;
+};
+
+export const routes: LocalRoute[] = [
+  route('GET', /^\/Spaces$/, getSpaces),
+  route('POST', /^\/Spaces$/, createSpace),
+  route('PATCH', /^\/Spaces\/([^/]+)$/, renameSpace),
+  route('DELETE', /^\/Spaces\/([^/]+)$/, deleteSpace),
   route('GET', /^\/Spaces\/([^/]+)\/([^/]+)\/Tree$/, getTree),
   route('GET', /^\/Pages\/([^/]+)$/, getPage),
   route('POST', /^\/Pages$/, createPage),

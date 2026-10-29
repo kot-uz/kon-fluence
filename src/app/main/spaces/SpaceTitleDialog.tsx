@@ -10,8 +10,8 @@ import {
 } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import { showMessage } from 'app/store/layout/messageSlice';
-import { createSpace, renameSpace } from 'app/services/spaces/spacesRegistry';
-import type { Space } from 'app/services/spaces/spacesRegistry';
+import { useCreateSpaceMutation, useRenameSpaceMutation } from 'app/docs';
+import type { Space } from 'app/docs';
 
 export interface SpaceTitleDialogProps {
   mode: 'create' | 'rename';
@@ -25,21 +25,27 @@ const SpaceTitleDialog = ({ mode, space, onClose }: SpaceTitleDialogProps) => {
   const dispatch = useDispatch();
   const [title, setTitle] = useState(space?.title || '');
   const [error, setError] = useState(false);
+  const [createSpace] = useCreateSpaceMutation();
+  const [renameSpace] = useRenameSpaceMutation();
 
-  const submit = () => {
+  const submit = async () => {
     const value = title.trim();
     if (!value) {
       setError(true);
       return;
     }
-    if (mode === 'rename' && space) {
-      renameSpace(space.id, value);
-      dispatch(showMessage({ message: t('AppSpaceRenamed') }));
-    } else {
-      createSpace(value);
-      dispatch(showMessage({ message: t('AppSpaceCreated') }));
+    try {
+      if (mode === 'rename' && space) {
+        await renameSpace({ id: space.id, title: value }).unwrap();
+        dispatch(showMessage({ message: t('AppSpaceRenamed') }));
+      } else {
+        await createSpace({ title: value }).unwrap();
+        dispatch(showMessage({ message: t('AppSpaceCreated') }));
+      }
+      onClose();
+    } catch {
+      dispatch(showMessage({ message: t('AppSpaceError'), variant: 'error' }));
     }
-    onClose();
   };
 
   return (

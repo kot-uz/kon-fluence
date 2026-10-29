@@ -1,9 +1,7 @@
-import type { BaseQueryApi } from '@reduxjs/toolkit/query';
 import { hostApi } from '../adapters/transport';
-import type { RtkQueryArgs } from '../adapters/transport';
 import { setTaskChecked } from '../utils/tasks';
 import type { DocContent, DocsPage, DocsTreeItem, SpaceType } from '../types';
-import { docsBaseQuery } from './docsBaseQuery';
+import { request } from './request';
 
 /** Пространство, чьё дерево страниц запрашивается. */
 export interface DocsSpaceArgs {
@@ -48,22 +46,6 @@ export interface ToggleDocsTaskArgs {
 export interface DeleteDocsPageResult {
   deletedIds: string[];
 }
-
-/**
- * Ответ queryFn в форме RTK Query: либо данные, либо ошибка.
- * Свой тип, потому что QueryReturnValue из @reduxjs/toolkit наружу не экспортируется.
- */
-type QueryResult<Result> =
-  | { data: Result; error?: undefined }
-  | { data?: undefined; error: unknown };
-
-// Эндпоинты используют собственный baseQuery (мок или /docs) через queryFn,
-// поэтому не зависят от baseQuery хост-API.
-const request =
-  <Arg, Result>(buildArgs: (arg: Arg) => RtkQueryArgs) =>
-  async (arg: Arg, api: BaseQueryApi, extraOptions: object) =>
-    // форму ответа задаёт сам эндпоинт: baseQuery отдаёт данные как unknown
-    (await docsBaseQuery(buildArgs(arg), api, extraOptions)) as QueryResult<Result>;
 
 export const docsApi = hostApi
   .enhanceEndpoints({ addTagTypes: ['DocsTree', 'DocsPage'] })

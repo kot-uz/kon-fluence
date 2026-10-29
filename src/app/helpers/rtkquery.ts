@@ -23,7 +23,7 @@ export type DocsBaseQuery = BaseQueryFn<RtkQueryArgs | string, unknown, RtkQuery
 
 /**
  * baseQuery на axios.
- * Используется, только когда моки выключены (REACT_APP_DOCS_MOCK=false).
+ * Используется только в облачном режиме.
  */
 export const rtkBaseQuery =
   (basePath = ''): DocsBaseQuery =>

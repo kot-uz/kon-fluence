@@ -4,7 +4,7 @@
 // см. app/services/docs/docsHostApi.
 //
 // httpClient — axios с базовым URL и токеном из localStorage (app/helpers/httpClient).
-// Нужен только при выключенных моках (REACT_APP_DOCS_MOCK=false).
+// Нужен только в облачном режиме.
 export { default as httpClient } from 'app/helpers/httpClient';
 export { rtkBaseQuery } from 'src/app/helpers/rtkquery';
 export type { DocsBaseQuery, RtkQueryArgs, RtkQueryError } from 'src/app/helpers/rtkquery';

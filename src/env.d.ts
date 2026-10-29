@@ -4,7 +4,6 @@
 // как process.env.REACT_APP_*.
 declare namespace NodeJS {
   interface ProcessEnv {
-    readonly REACT_APP_DOCS_MOCK: string;
     readonly REACT_APP_API_URL: string;
   }
 }

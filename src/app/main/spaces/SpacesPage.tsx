@@ -14,9 +14,8 @@ import {
 import { Add, Delete, Description, Edit, MoreVert } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { showMessage } from 'app/store/layout/messageSlice';
-import { deleteSpace, useSpaces } from 'app/services/spaces/spacesRegistry';
-import type { Space } from 'app/services/spaces/spacesRegistry';
-import { DOCS_BASE_PATH, SPACE_TYPES } from 'app/docs';
+import { DOCS_BASE_PATH, SPACE_TYPES, useDeleteSpaceMutation, useGetSpacesQuery } from 'app/docs';
+import type { Space } from 'app/docs';
 import ConfirmDialog from 'app/shared-components/ConfirmDialog';
 import SpaceTitleDialog from './SpaceTitleDialog';
 
@@ -30,15 +29,20 @@ type DialogState =
 const SpacesPage = () => {
   const { t } = useTranslation('translations');
   const dispatch = useDispatch();
-  const spaces = useSpaces();
+  const { data: spaces = [], isLoading } = useGetSpacesQuery();
+  const [deleteSpace] = useDeleteSpaceMutation();
   const [dialog, setDialog] = useState<DialogState | null>(null);
   const [menu, setMenu] = useState<{ anchor: HTMLElement; space: Space } | null>(null);
 
   const closeMenu = () => setMenu(null);
 
-  const confirmDelete = (space: Space) => {
-    deleteSpace(space.id);
-    dispatch(showMessage({ message: t('AppSpaceDeleted') }));
+  const confirmDelete = async (space: Space) => {
+    try {
+      await deleteSpace(space.id).unwrap();
+      dispatch(showMessage({ message: t('AppSpaceDeleted') }));
+    } catch {
+      dispatch(showMessage({ message: t('AppSpaceError'), variant: 'error' }));
+    }
   };
 
   return (
@@ -60,7 +64,7 @@ const SpacesPage = () => {
           {t('AppSpacesHint')}
         </Typography>
 
-        {spaces.length === 0 ? (
+        {isLoading ? null : spaces.length === 0 ? (
           <div className="flex flex-col items-center justify-center gap-8 py-64 text-center">
             <Typography variant="h6">{t('AppNoSpaces')}</Typography>
             <Typography color="text.secondary">{t('AppNoSpacesHint')}</Typography>
