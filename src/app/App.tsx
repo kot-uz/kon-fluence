@@ -9,6 +9,7 @@ import Loading from 'app/shared-components/Loading';
 import SpacesPage from 'app/main/spaces/SpacesPage';
 import AuthPage from 'app/auth/AuthPage';
 import CloudGuard from 'app/auth/CloudGuard';
+import ImportFlow from 'app/import/ImportFlow';
 import { DOCS_BASE_PATH, DocsAppConfig } from 'app/docs';
 
 const AppLayout = () => (
@@ -19,6 +20,7 @@ const AppLayout = () => (
         <Outlet />
       </Suspense>
     </div>
+    <ImportFlow />
     <AppMessage />
   </div>
 );

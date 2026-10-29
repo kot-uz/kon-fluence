@@ -8,6 +8,7 @@ import user from './userSlice';
 import auth from './authSlice';
 import i18n from './i18nSlice';
 import storageMode from './storageModeSlice';
+import importState from './importSlice';
 
 const store = configureStore({
   reducer: {
@@ -17,6 +18,7 @@ const store = configureStore({
     auth,
     i18n,
     storageMode,
+    import: importState,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

@@ -23,9 +23,11 @@ import {
   Computer,
   DarkMode,
   LightMode,
+  DeleteSweep,
   Logout,
   MenuBook,
   Person,
+  Upload,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useAppSelector } from 'app/store';
@@ -43,6 +45,7 @@ import {
 } from 'app/store/storageModeSlice';
 import type { StorageMode } from 'app/store/storageModeSlice';
 import { clearAccount, selectAccount } from 'app/store/authSlice';
+import { requestImport } from 'app/store/importSlice';
 import { logout } from 'app/auth/authApi';
 import { docsHostApi } from 'app/services/docs/docsHostApi';
 import { resetDocsLocalData } from 'app/docs';
@@ -180,6 +183,24 @@ const AppHeader = () => {
                 onClose={() => setAccountAnchor(null)}
               >
                 <MenuItem disabled>{account?.email}</MenuItem>
+                <MenuItem
+                  onClick={() => {
+                    setAccountAnchor(null);
+                    dispatch(requestImport());
+                  }}
+                >
+                  <Upload fontSize="small" className="mr-8" />
+                  {t('AppImportData')}
+                </MenuItem>
+                <MenuItem
+                  onClick={() => {
+                    setAccountAnchor(null);
+                    setResetConfirmOpen(true);
+                  }}
+                >
+                  <DeleteSweep fontSize="small" className="mr-8" />
+                  {t('AppClearLocalData')}
+                </MenuItem>
                 <MenuItem onClick={signOut}>
                   <Logout fontSize="small" className="mr-8" />
                   {t('AuthLogout')}
@@ -227,8 +248,8 @@ const AppHeader = () => {
 
       {resetConfirmOpen && (
         <ConfirmDialog
-          title={t('AppResetData')}
-          text={t('AppResetDataConfirm')}
+          title={t(isLocalMode ? 'AppResetData' : 'AppClearLocalData')}
+          text={t(isLocalMode ? 'AppResetDataConfirm' : 'AppClearLocalDataConfirm')}
           onConfirm={resetData}
           onClose={() => setResetConfirmOpen(false)}
         />

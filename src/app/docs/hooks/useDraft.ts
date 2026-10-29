@@ -6,6 +6,11 @@ const DRAFT_DELAY = 1000;
 
 const getDraftKey = (pageId: string) => `docs-draft:${pageId}`;
 
+const pendingFlushes = new Set<() => void>();
+
+/** Сразу пишет все отложенные черновики (например, перед переносом данных в аккаунт). */
+export const flushPendingDrafts = () => pendingFlushes.forEach((flush) => flush());
+
 /** Черновик без времени сохранения — его ставит сам хук. */
 type DraftInput = Omit<PageDraft, 'savedAt'>;
 
@@ -44,6 +49,13 @@ export const useDraft = (pageId: string) => {
     removeStorage(key);
     setSavedAt(null);
   }, [key]);
+
+  useEffect(() => {
+    pendingFlushes.add(flushDraft);
+    return () => {
+      pendingFlushes.delete(flushDraft);
+    };
+  }, [flushDraft]);
 
   // при уходе со страницы несохранённый хвост не теряем
   useEffect(() => flushDraft, [flushDraft]);
